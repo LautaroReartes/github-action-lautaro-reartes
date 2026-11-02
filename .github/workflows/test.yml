@@ -1,12 +1,32 @@
-name: Test Action
-on:
+name: Trigger-Dispatch
+on: 
   workflow_dispatch:
+    inputs:
+      nivel:
+        description: 'Nivel'
+        required: true        
+        type: choice
+        options:
+          - bajo
+          - medio
+          - alto
+      nombre:
+        description: 'Ingresa tu nombre'
+        required: false
+        type: string
+        default: 'Anonimo'        
+  
 jobs:
-  prueba:
-    runs-on: ubuntu-latest
+
+  demo:
+  
+    runs-on: self-hosted    
     steps:
-      - uses: actions/checkout@v4
-      - name: Ejecutar Action
-        uses: ./
-        with:
-          nombre: GitHub Actions
+      - name: Comparacion de nombre
+        if: ${{ (github.event.inputs.nombre == 'Anonimo') && (true) }} 
+        run: echo 'Condicion ok'
+        
+      - name: Saludar
+        run: echo Parametros
+      - name: Saludo input
+        run: echo ${{ github.event.inputs.nombre }}
