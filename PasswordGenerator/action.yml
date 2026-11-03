@@ -1,0 +1,35 @@
+name: PasswordGenerator
+
+description: Generador de contraseña
+inputs:
+  Longitud:
+    description: Longitud de contraseña
+    required: true
+    default: 10
+outputs:
+  resultado:
+    description: Contraseña generada.
+    value: ${{ steps.generar.outputs.resultado }}
+runs:
+  using: composite
+  steps:
+    - name: Generar contraseña
+      id: generar
+      shell: pwsh
+      run: |
+        $longitud = [int]"${{ inputs.Longitud }}"
+
+        if ($longitud -lt 1) {
+          throw "La longitud debe ser mayor a cero."
+        }
+
+        $caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*_-+='
+
+        $bytes = New-Object byte[] $longitud
+        [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+
+        $password = -join ($bytes | ForEach-Object {
+          $caracteres[$_ % $caracteres.Length]
+        })
+
+        "resultado=$password" >> $env:GITHUB_OUTPUT
